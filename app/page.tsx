@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
+import { Show, SignInButton } from "@clerk/nextjs";
 
 export default function Home() {
   return (
@@ -15,7 +15,7 @@ export default function Home() {
           anytime.
         </p>
 
-        <SignedOut>
+        <Show when="signed-out">
           <div className="bg-white rounded-2xl shadow-md border border-orange-100 p-8 mb-6">
             <p className="text-orange-800 font-medium mb-4">
               Sign in to start searching and saving recipes.
@@ -34,9 +34,9 @@ export default function Home() {
               </Link>
             </div>
           </div>
-        </SignedOut>
+        </Show>
 
-        <SignedIn>
+        <Show when="signed-in">
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link
               href="/search"
@@ -51,7 +51,7 @@ export default function Home() {
               My Favorites
             </Link>
           </div>
-        </SignedIn>
+        </Show>
       </div>
     </div>
   );

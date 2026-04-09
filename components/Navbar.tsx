@@ -1,10 +1,5 @@
 import Link from "next/link";
-import {
-  SignedIn,
-  SignedOut,
-  SignInButton,
-  UserButton,
-} from "@clerk/nextjs";
+import { Show, SignInButton, UserButton } from "@clerk/nextjs";
 
 export default function Navbar() {
   return (
@@ -14,7 +9,7 @@ export default function Navbar() {
           Recipe Finder
         </Link>
         <nav className="flex items-center gap-4">
-          <SignedIn>
+          <Show when="signed-in">
             <Link
               href="/search"
               className="text-sm font-medium hover:opacity-80 transition-opacity"
@@ -28,14 +23,14 @@ export default function Navbar() {
               Favorites
             </Link>
             <UserButton />
-          </SignedIn>
-          <SignedOut>
+          </Show>
+          <Show when="signed-out">
             <SignInButton mode="modal">
               <button className="bg-white text-orange-600 text-sm font-semibold px-4 py-1.5 rounded-full hover:bg-orange-50 transition-colors">
                 Sign In
               </button>
             </SignInButton>
-          </SignedOut>
+          </Show>
         </nav>
       </div>
     </header>
