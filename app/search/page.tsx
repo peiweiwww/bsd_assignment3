@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import Image from "next/image";
 
 type Meal = {
@@ -19,7 +19,18 @@ export default function SearchPage() {
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
   const [saving, setSaving] = useState<string | null>(null);
+  const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
   const [toasts, setToasts] = useState<Toast[]>([]);
+
+  useEffect(() => {
+    fetch("/api/favorites")
+      .then((r) => r.json())
+      .then((data) => {
+        const ids = (data.favorites ?? []).map((f: { meal_id: string }) => f.meal_id);
+        setSavedIds(new Set(ids));
+      })
+      .catch(() => {});
+  }, []);
 
   const addToast = useCallback((message: string, type: "success" | "error") => {
     const id = Date.now();
@@ -58,6 +69,7 @@ export default function SearchPage() {
         }),
       });
       if (res.status === 201) {
+        setSavedIds((prev) => new Set(prev).add(meal.idMeal));
         addToast(`"${meal.strMeal}" saved to favorites!`, "success");
       } else {
         const data = await res.json();
@@ -148,13 +160,22 @@ export default function SearchPage() {
                   )}
                 </div>
                 <div className="mt-auto">
-                  <button
-                    onClick={() => handleSave(meal)}
-                    disabled={saving === meal.idMeal}
-                    className="w-full bg-orange-600 text-white text-sm font-semibold py-2 rounded-xl hover:bg-orange-700 transition-colors disabled:opacity-60"
-                  >
-                    {saving === meal.idMeal ? "Saving..." : "Save to Favorites"}
-                  </button>
+                  {savedIds.has(meal.idMeal) ? (
+                    <button
+                      disabled
+                      className="w-full bg-gray-100 text-gray-400 text-sm font-semibold py-2 rounded-xl cursor-not-allowed"
+                    >
+                      Saved ✓
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => handleSave(meal)}
+                      disabled={saving === meal.idMeal}
+                      className="w-full bg-orange-600 text-white text-sm font-semibold py-2 rounded-xl hover:bg-orange-700 transition-colors disabled:opacity-60"
+                    >
+                      {saving === meal.idMeal ? "Saving..." : "Save to Favorites"}
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
